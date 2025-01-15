@@ -11,3 +11,11 @@ func NewId() (Id, error) {
 	}
 	return Id(id), nil
 }
+
+func ValidateId(value string) (Id , error) {
+	id, err := uuid.Parse(value)
+	if err != nil {
+		return Id{}, err
+	}
+	return Id(id), nil
+}
