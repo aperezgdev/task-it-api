@@ -7,7 +7,7 @@ import (
 )
 
 type TeamRepository interface {
-	save(ctx context.Context, team model.Team) error
-	delete(ctx context.Context, team model.Team) error
-	update(ctx context.Context, team model.Team) error
+	Save(ctx context.Context, team model.Team) error
+	Delete(ctx context.Context, team model.Team) error
+	Update(ctx context.Context, team model.Team) error
 }

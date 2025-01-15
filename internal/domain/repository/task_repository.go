@@ -7,7 +7,7 @@ import (
 )
 
 type TaskRepository interface {
-	save(ctx context.Context, task model.Task) error
-	delete(ctx context.Context, task model.Task) error
-	update(ctx context.Context, task model.Task) error
+	Save(ctx context.Context, task model.Task) error
+	Delete(ctx context.Context, task model.Task) error
+	Update(ctx context.Context, task model.Task) error
 }

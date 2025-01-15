@@ -8,7 +8,7 @@ import (
 )
 
 type StatusRepository interface {
-	save(ctx context.Context, status model.Status) error
-	delete(ctx context.Context, statusId valueobject.Id) error
-	update(ctx context.Context, status model.Status) error
+	Save(ctx context.Context, status model.Status) error
+	Delete(ctx context.Context, statusId valueobject.Id) error
+	Update(ctx context.Context, status model.Status) error
 }

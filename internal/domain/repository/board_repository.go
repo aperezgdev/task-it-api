@@ -8,7 +8,7 @@ import (
 )
 
 type BoardRepository interface {
-	save(ctx context.Context, board model.Board) error
-	delete(ctx context.Context, boardId valueobject.Id) error
-	update(ctx context.Context, board model.Board) error
+	Save(ctx context.Context, board model.Board) error
+	Delete(ctx context.Context, boardId valueobject.Id) error
+	Update(ctx context.Context, board model.Board) error
 }
