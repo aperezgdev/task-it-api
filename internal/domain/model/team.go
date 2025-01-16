@@ -10,3 +10,31 @@ type Team struct {
 	Owner valueobject.Id
 	CreatedAt valueobject.CreatedAt
 }
+
+func NewTeam(title, description, owner string) (Team, error) {
+	idVO, errId := valueobject.NewId()
+	if errId != nil {
+		return Team{}, errId
+	}
+	titleVO, errTitle := valueobject.NewTitle(title)
+	if errTitle != nil {
+		return Team{}, errTitle
+	}
+	descriptionVO, errDescription := valueobject.NewDescription(description)
+	if errDescription != nil {
+		return Team{}, errDescription
+	}
+	ownerVO, errOwner := valueobject.ValidateId(owner)
+	if errOwner != nil {
+		return Team{}, errOwner
+	}
+
+	return Team{
+		Id: idVO,
+		Title: titleVO,
+		Description: descriptionVO,
+		Members: []valueobject.Id{},
+		Owner: ownerVO,
+		CreatedAt: valueobject.NewCreatedAt(),
+	}, nil
+}
