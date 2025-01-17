@@ -34,16 +34,17 @@ func (tc TeamCreator) Run(ctx context.Context, title, owner, description string)
 		slog.Any("description", 
 		description),
 	)
-	_, errUser := tc.userFinder.Run(ctx, owner)
-	if errUser != nil {
-		tc.logger.Info("TeamCreator - Run - Error has ocurred trying to find user", slog.Any("err", errUser))
-		return errUser
-	}
 
 	team, err := model.NewTeam(title, description, owner)
 	if err != nil {
 		tc.logger.Info("TeamCreator - Run - Error has ocurred trying to instance new team")
 		return err
+	}
+
+	_, errUser := tc.userFinder.Run(ctx, owner)
+	if errUser != nil {
+		tc.logger.Info("TeamCreator - Run - Error has ocurred trying to find user", slog.Any("err", errUser))
+		return errUser
 	}
 
 	return tc.repository.Save(ctx, team)
