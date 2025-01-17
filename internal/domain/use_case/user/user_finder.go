@@ -35,7 +35,7 @@ func (uf *UserFinder) Run(ctx context.Context, userId string) (model.User, error
 
 	if !userOptional.IsPresent {
 		uf.logger.Info("UserFinder - Run - User not exist")
-		return model.User{}, errors.ErrNotExists
+		return model.User{}, errors.ErrNotExist
 	}
 
 	return userOptional.Value, nil
