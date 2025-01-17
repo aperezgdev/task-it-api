@@ -27,3 +27,8 @@ func (m *MockTeamRepository) Delete(ctx context.Context, idTeam valueobject.Id) 
 	args := m.Called(ctx, idTeam)
 	return args.Error(0)
 }
+
+func (m *MockTeamRepository) Update(ctx context.Context, team model.Team) error {
+	args := m.Called(ctx, team)
+	return args.Error(0)
+}
