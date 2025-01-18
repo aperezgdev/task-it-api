@@ -16,10 +16,9 @@ import (
 func TestUserFinder(t *testing.T) {
 	t.Parallel()
 
-	mockRepository := &repository.MockUserRepository{}
-	userFinder := NewUserFinder(*slog.Default(), mockRepository)
-
 	t.Run("should find an existing user", func(t *testing.T) {
+		mockRepository := &repository.MockUserRepository{}
+		userFinder := NewUserFinder(*slog.Default(), mockRepository)
 		mockRepository.On("Find", mock.Anything, mock.Anything).Once().Return(pkg.NewOptional(model.User{}), nil)
 		_, err := userFinder.Run(context.Background(), "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
 		if err != nil {
@@ -30,6 +29,8 @@ func TestUserFinder(t *testing.T) {
 	})
 
 	t.Run("should return not exist error on not an existing user", func(t *testing.T) {
+		mockRepository := &repository.MockUserRepository{}
+		userFinder := NewUserFinder(*slog.Default(), mockRepository)
 		mockRepository.On("Find", mock.Anything, mock.Anything).Once().Return(pkg.EmptyOptional[model.User](), nil)
 		_, err := userFinder.Run(context.Background(), "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
 

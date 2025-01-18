@@ -18,7 +18,7 @@ func TestFinder(t *testing.T) {
 
 	t.Run("should find existing board", func(t *testing.T) {
 		boardRepository := &repository.MockBoardRepository{}
-		boardFinder := NewBoardFinder(slog.Logger{}, boardRepository)
+		boardFinder := NewBoardFinder(*slog.Default(), boardRepository)
 		boardRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Board{}), nil)
 		_, err := boardFinder.Run(context.Background(), "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
 		
