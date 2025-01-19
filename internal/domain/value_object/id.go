@@ -22,3 +22,7 @@ func ValidateId(value string) (Id , error) {
 	}
 	return Id(id), nil
 }
+
+func (id Id) String() string {
+	return uuid.UUID(id).String()
+}
