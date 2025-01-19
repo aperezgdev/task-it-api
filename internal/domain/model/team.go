@@ -38,3 +38,7 @@ func NewTeam(title, description, owner string) (Team, error) {
 		CreatedAt: valueobject.NewCreatedAt(),
 	}, nil
 }
+
+func (t *Team) AddMember(userId valueobject.Id) {
+	t.Members = append(t.Members, userId)
+}
