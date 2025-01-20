@@ -1,6 +1,9 @@
 package model
 
-import valueobject "github.com/aperezgdev/task-it-api/internal/domain/value_object"
+import (
+	"github.com/aperezgdev/task-it-api/internal/domain/errors"
+	valueobject "github.com/aperezgdev/task-it-api/internal/domain/value_object"
+)
 
 type Team struct {
 	Id valueobject.Id
@@ -41,4 +44,14 @@ func NewTeam(title, description, owner string) (Team, error) {
 
 func (t *Team) AddMember(userId valueobject.Id) {
 	t.Members = append(t.Members, userId)
+}
+
+func (t *Team) RemoveMember(userId valueobject.Id) error {
+	for i, v := range t.Members {
+		if v == userId {
+			t.Members = append(t.Members[:i], t.Members[i+1:]...)
+			return nil
+		}
+	}
+	return errors.ErrNotExist
 }
