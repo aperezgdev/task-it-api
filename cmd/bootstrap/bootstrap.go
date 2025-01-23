@@ -1,16 +1,19 @@
 package bootstrap
 
 import (
-	"io"
-	"net/http"
+	"log/slog"
+
+	"github.com/aperezgdev/task-it-api/internal/infrastructure/config"
+	"github.com/aperezgdev/task-it-api/internal/infrastructure/http"
+	"github.com/aperezgdev/task-it-api/internal/infrastructure/http/controller"
 )
 
 func Run() error {
-	helloHandler := func(w http.ResponseWriter, req *http.Request) {
-		io.WriteString(w, "Hello, world!\n")
-	}
+	logger := slog.Default()
+	config := config.NewConfig(logger)
+	server := http.NewServer(logger, config)
 
-	http.HandleFunc("/hello", helloHandler)
+	server.AddHandler("/health", controller.NewHealthController(*logger).GetHealth)
 
-	return http.ListenAndServe(":3000", nil)
+	return server.Start()
 }
