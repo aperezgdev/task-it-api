@@ -23,7 +23,7 @@ func TestTaskCreator(t *testing.T) {
 		taskRepository.On("Save", mock.Anything, mock.Anything).Return(nil)
 		creator := NewTaskCreator(*slog.Default(), boardRepository, userRepository, taskRepository)
 
-		err := creator.Run(context.Background(), "title", "description", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
+		err := creator.Run(context.Background(), "title", "description", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
 		if err != nil {
 			t.Errorf("Error shouldnt happened on valid params")
 		}
@@ -41,7 +41,7 @@ func TestTaskCreator(t *testing.T) {
 		taskRepository := &repository.MockTaskRepository{}
 		creator := NewTaskCreator(*slog.Default(), boardRepository, userRepository, taskRepository)
 
-		err := creator.Run(context.Background(), "title", "description", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
+		err := creator.Run(context.Background(), "title", "description", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
 		if err == nil {
 			t.Errorf("Error should happened on invalid board id")
 		}
@@ -59,7 +59,7 @@ func TestTaskCreator(t *testing.T) {
 		taskRepository := &repository.MockTaskRepository{}
 		creator := NewTaskCreator(*slog.Default(), boardRepository, userRepository, taskRepository)
 
-		err := creator.Run(context.Background(), "title", "description", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
+		err := creator.Run(context.Background(), "title", "description", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
 		if err == nil {
 			t.Errorf("Error should happened on invalid user id")
 		}
@@ -73,7 +73,7 @@ func TestTaskCreator(t *testing.T) {
 		taskRepository := &repository.MockTaskRepository{}
 		creator := NewTaskCreator(*slog.Default(), boardRepository, userRepository, taskRepository)
 
-		err := creator.Run(context.Background(), "", "description", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
+		err := creator.Run(context.Background(), "", "description", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9", "01946ba3-ee73-76e6-83a9-33f87a35d6e9")
 		if err == nil {
 			t.Errorf("Error should happened on invalid task params")
 		}
