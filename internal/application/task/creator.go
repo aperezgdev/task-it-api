@@ -26,7 +26,7 @@ func NewTaskCreator(logger slog.Logger, boardRepository repository.BoardReposito
 	}
 }
 
-func (tc *TaskCreator) Run(ctx context.Context,title, description, creator, asigned, statusId string) error {
+func (tc *TaskCreator) Run(ctx context.Context,title, description, creator, asigned, statusId, boardId string) error {
 	tc.logger.Info(
 			"TaskCreator - Run - Params: ", 
 			slog.Any("title", title), 
@@ -35,7 +35,7 @@ func (tc *TaskCreator) Run(ctx context.Context,title, description, creator, asig
 			slog.Any("asigned", asigned),
 			slog.Any("statusId", statusId),
 		)
-	_, errBoard := tc.boardFinder.Run(ctx, creator)
+	_, errBoard := tc.boardFinder.Run(ctx, boardId)
 	if errBoard != nil {
 		tc.logger.Info("TaskCreator - Run - Board not found")
 		return errBoard
@@ -47,7 +47,7 @@ func (tc *TaskCreator) Run(ctx context.Context,title, description, creator, asig
 		return errUser
 	}
 
-	task, err := model.NewTask(title, description, creator, asigned, statusId)
+	task, err := model.NewTask(title, description, creator, asigned, statusId, boardId)
 	if err != nil {
 		tc.logger.Info("TaskCreator - Run - Error trying to create task")
 		return err

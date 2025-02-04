@@ -9,10 +9,11 @@ type Task struct {
 	Creator valueobject.Id
 	Asigned valueobject.Id
 	StatusId valueobject.Id
+	BoardId valueobject.Id
 	CreatedAt valueobject.CreatedAt
 }
 
-func NewTask(title, description, creator, asigned, statusId string) (Task, error) {
+func NewTask(title, description, creator, asigned, statusId, board string) (Task, error) {
 	idVO, errId := valueobject.NewId()
 	if errId != nil {
 		return Task{}, errId
@@ -43,6 +44,11 @@ func NewTask(title, description, creator, asigned, statusId string) (Task, error
 		return Task{}, errStatusId
 	}
 
+	boardIdVO, errBoardId := valueobject.ValidateId(board)
+	if errBoardId != nil {
+		return Task{}, errBoardId
+	}
+
 	return Task{
 		Id: idVO,
 		Title: titleVO,
@@ -50,6 +56,7 @@ func NewTask(title, description, creator, asigned, statusId string) (Task, error
 		Creator: creatorVO,
 		Asigned: asignedVO,
 		StatusId: statusIdVO,
+		BoardId: boardIdVO,
 		CreatedAt: valueobject.NewCreatedAt(),
 	}, nil
 }
