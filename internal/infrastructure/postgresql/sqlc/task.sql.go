@@ -22,7 +22,7 @@ func (q *Queries) DeleteTask(ctx context.Context, id uuid.UUID) error {
 }
 
 const findTask = `-- name: FindTask :one
-SELECT id, title, description, creator, asigned, status_id, created_at FROM tasks WHERE id = $1
+SELECT id, title, description, creator, asigned, status_id, board_id, created_at FROM tasks WHERE id = $1
 `
 
 func (q *Queries) FindTask(ctx context.Context, id uuid.UUID) (Task, error) {
@@ -35,13 +35,14 @@ func (q *Queries) FindTask(ctx context.Context, id uuid.UUID) (Task, error) {
 		&i.Creator,
 		&i.Asigned,
 		&i.StatusID,
+		&i.BoardID,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const saveTask = `-- name: SaveTask :one
-INSERT INTO tasks (id, title, description, creator, asigned, status_id, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, title, description, creator, asigned, status_id, created_at
+INSERT INTO tasks (id, title, description, creator, asigned, status_id, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id, title, description, creator, asigned, status_id, board_id, created_at
 `
 
 type SaveTaskParams struct {
@@ -72,6 +73,7 @@ func (q *Queries) SaveTask(ctx context.Context, arg SaveTaskParams) (Task, error
 		&i.Creator,
 		&i.Asigned,
 		&i.StatusID,
+		&i.BoardID,
 		&i.CreatedAt,
 	)
 	return i, err

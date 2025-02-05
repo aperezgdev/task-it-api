@@ -42,6 +42,7 @@ type Task struct {
 	Creator     uuid.UUID
 	Asigned     uuid.UUID
 	StatusID    uuid.UUID
+	BoardID     uuid.UUID
 	CreatedAt   pgtype.Timestamp
 }
 
