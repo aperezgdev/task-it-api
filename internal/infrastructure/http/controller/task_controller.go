@@ -26,10 +26,11 @@ type TaskController struct {
     logger slog.Logger
     creator task.TaskCreator
     mover task.TaskMover
+    remover task.TaskRemover
 }
 
-func NewTaskController(logger slog.Logger, creator task.TaskCreator, mover task.TaskMover) TaskController {
-    return TaskController{logger, creator, mover}
+func NewTaskController(logger slog.Logger, creator task.TaskCreator, mover task.TaskMover, remover task.TaskRemover) TaskController {
+    return TaskController{logger, creator, mover, remover}
 }
 
 func (tc *TaskController) PostController(w http.ResponseWriter, r http.Request) {
@@ -80,6 +81,17 @@ func (tc *TaskController) PatchController(w http.ResponseWriter, r http.Request)
 
     if errMover != nil {
         writeError(w, errMover)
+        return
+    }
+
+    w.WriteHeader(http.StatusNoContent)
+}
+
+func (tc *TaskController) DeleteController(w http.ResponseWriter, r http.Request) {
+    var taskId = r.PathValue("id")
+    err := tc.remover.Run(r.Context(), taskId)
+    if err != nil {
+        writeError(w, err)
         return
     }
 
