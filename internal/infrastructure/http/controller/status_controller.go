@@ -18,10 +18,11 @@ type statusPostRequest struct {
 type StatusController struct {
 	logger slog.Logger
 	creator status.StatusCreator
+	remover status.StatusRemover
 }
 
-func NewStatusController(logger slog.Logger, creator status.StatusCreator) StatusController {
-	return StatusController{logger, creator}
+func NewStatusController(logger slog.Logger, creator status.StatusCreator, remover status.StatusRemover) StatusController {
+	return StatusController{logger, creator, remover}
 }
 
 func (sc *StatusController) PostController(w http.ResponseWriter, r http.Request) {
@@ -40,4 +41,15 @@ func (sc *StatusController) PostController(w http.ResponseWriter, r http.Request
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (sc *StatusController) DeleteController(w http.ResponseWriter, r http.Request) {
+	var statusId = r.PathValue("id")
+	err := sc.remover.Run(r.Context(), statusId)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
