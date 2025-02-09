@@ -23,7 +23,7 @@ func TestStatusControllerPost(t *testing.T) {
 		statusRepository.On("Save", mock.Anything, mock.Anything).Return(nil)
 		boardRepositoryMock := repository.MockBoardRepository{}
 		boardRepositoryMock.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Board{}), nil)
-		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), statusRepository, &boardRepositoryMock))
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), statusRepository, &boardRepositoryMock), status.NewStatusRemover(*slog.Default(), nil))
 		uuid, _ := uuid.NewV7()
 
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer([]byte(`{"title":"title","board":"` + uuid.String() + `","nextStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"],"previousStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"]}`)))
@@ -40,7 +40,7 @@ func TestStatusControllerPost(t *testing.T) {
 		statusRepository.On("Save", mock.Anything, mock.Anything).Return(nil)
 		boardRepository := new(repository.MockBoardRepository)
 		boardRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Board{}), nil)
-		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), statusRepository, boardRepository))
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), statusRepository, boardRepository), status.NewStatusRemover(*slog.Default(), nil))
 		uuid, _ := uuid.NewV7()
 
 		writer := httptest.NewRecorder()
@@ -48,6 +48,44 @@ func TestStatusControllerPost(t *testing.T) {
 
 		if writer.Code != http.StatusBadRequest {
 			t.Errorf("expected %d, got %d", http.StatusBadRequest, writer.Code)
+		}
+	})
+}
+
+func TestStatusControllerDelete(t *testing.T) {
+	t.Parallel()
+
+	t.Run("should delete status", func(t *testing.T) {
+		statusRepository := new(repository.MockStatusRepository)
+		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Status{}), nil)
+		statusRepository.On("Delete", mock.Anything, mock.Anything).Return(nil)
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), nil, nil), status.NewStatusRemover(*slog.Default(), statusRepository))
+		uuid, _ := uuid.NewV7()
+
+		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
+		req.SetPathValue("id", uuid.String())
+		writer := httptest.NewRecorder()
+		statusController.DeleteController(writer, *req)
+
+		if writer.Code != http.StatusNoContent {
+			t.Errorf("expected %d, got %d", http.StatusNoContent, writer.Code)
+		}
+	})
+
+	t.Run("should return not found", func(t *testing.T) {
+		statusRepository := new(repository.MockStatusRepository)
+		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Status](), nil)
+		statusRepository.On("Delete", mock.Anything, mock.Anything).Return(nil)
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), nil, nil), status.NewStatusRemover(*slog.Default(), statusRepository))
+		uuid, _ := uuid.NewV7()
+
+		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
+		req.SetPathValue("id", uuid.String())
+		writer := httptest.NewRecorder()
+		statusController.DeleteController(writer, *req)
+
+		if writer.Code != http.StatusNotFound {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, writer.Code)
 		}
 	})
 }
