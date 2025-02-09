@@ -18,10 +18,11 @@ type boardPostRequest struct {
 type BoardController struct {
 	logger slog.Logger
 	creator board.BoardCreator
+	remover board.BoardRemover
 }
 
-func NewBoardController(logger slog.Logger, creator board.BoardCreator) BoardController {
-	return BoardController{logger, creator}
+func NewBoardController(logger slog.Logger, creator board.BoardCreator, remover board.BoardRemover) BoardController {
+	return BoardController{logger, creator, remover}
 }
 
 func (bc *BoardController) PostController(w http.ResponseWriter, r http.Request) {
@@ -40,4 +41,15 @@ func (bc *BoardController) PostController(w http.ResponseWriter, r http.Request)
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (bc *BoardController) DeleteController(w http.ResponseWriter, r http.Request) {
+	var boardId = r.PathValue("id")
+	err := bc.remover.Run(r.Context(), boardId)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
