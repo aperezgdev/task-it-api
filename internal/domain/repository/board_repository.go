@@ -11,9 +11,15 @@ import (
 
 type BoardRepository interface {
 	Find(ctx context.Context, boardId valueobject.Id) (pkg.Optional[model.Board], error)
+	FindByTeam(ctx context.Context, teamId valueobject.Id) (pkg.Optional[[]model.Board], error)
 	Save(ctx context.Context, board model.Board) error
 	Delete(ctx context.Context, boardId valueobject.Id) error
 	Update(ctx context.Context, board model.Board) error
+}
+
+func (m *MockBoardRepository) FindByTeam(ctx context.Context, id valueobject.Id) (pkg.Optional[[]model.Board], error) {
+	args := m.Called(ctx, id)
+	return args.Get(0).(pkg.Optional[[]model.Board]), args.Error(1)
 }
 
 type MockBoardRepository struct {
@@ -22,7 +28,7 @@ type MockBoardRepository struct {
 
 func (m *MockBoardRepository) Find(ctx context.Context, boardId valueobject.Id) (pkg.Optional[model.Board], error) {
 	args := m.Called(ctx, boardId)
-	return args.Get(0).(pkg.Optional[model.Board]), args.Error(1)	
+	return args.Get(0).(pkg.Optional[model.Board]), args.Error(1)
 }
 
 func (m *MockBoardRepository) Save(ctx context.Context, board model.Board) error {

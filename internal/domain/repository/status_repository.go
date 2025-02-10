@@ -11,6 +11,7 @@ import (
 
 type StatusRepository interface {
 	Find(ctx context.Context, statusId valueobject.Id) (pkg.Optional[model.Status], error)
+	FindByBoard(ctx context.Context, boardId valueobject.Id) (pkg.Optional[[]model.Status], error)
 	Save(ctx context.Context, status model.Status) error
 	Delete(ctx context.Context, statusId valueobject.Id) error
 	Update(ctx context.Context, status model.Status) error
@@ -23,6 +24,11 @@ type MockStatusRepository struct {
 func (m *MockStatusRepository) Find(ctx context.Context, statusId valueobject.Id) (pkg.Optional[model.Status], error) {
 	args := m.Called(ctx, statusId)
 	return args.Get(0).(pkg.Optional[model.Status]), args.Error(1)
+}
+
+func (m *MockStatusRepository) FindByBoard(ctx context.Context, boardId valueobject.Id) (pkg.Optional[[]model.Status], error) {
+	args := m.Called(ctx, boardId)
+	return args.Get(0).(pkg.Optional[[]model.Status]), args.Error(1)
 }
 
 func (m *MockStatusRepository) Save(ctx context.Context, status model.Status) error {

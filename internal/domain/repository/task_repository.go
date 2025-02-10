@@ -11,6 +11,7 @@ import (
 
 type TaskRepository interface {
 	Find(ctx context.Context, taskId valueobject.Id) (pkg.Optional[model.Task], error)
+	FindByTeam(ctx context.Context, boardId valueobject.Id) (pkg.Optional[[]model.Task], error)
 	Save(ctx context.Context, task model.Task) error
 	Delete(ctx context.Context, taskId valueobject.Id) error
 	Update(ctx context.Context, task model.Task) error
@@ -18,6 +19,11 @@ type TaskRepository interface {
 
 type MockTaskRepository struct {
 	mock.Mock
+}
+
+func (m *MockTaskRepository) FindByTeam(ctx context.Context, teamId valueobject.Id) (pkg.Optional[[]model.Task], error) {
+	args := m.Called(ctx, teamId)
+	return args.Get(0).(pkg.Optional[[]model.Task]), args.Error(1)
 }
 
 func (m *MockTaskRepository) Find(ctx context.Context, taskId valueobject.Id) (pkg.Optional[model.Task], error) {
