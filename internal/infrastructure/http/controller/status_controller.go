@@ -19,10 +19,11 @@ type StatusController struct {
 	logger slog.Logger
 	creator status.StatusCreator
 	remover status.StatusRemover
+	finderByBoard status.StatusFinderByBoard
 }
 
-func NewStatusController(logger slog.Logger, creator status.StatusCreator, remover status.StatusRemover) StatusController {
-	return StatusController{logger, creator, remover}
+func NewStatusController(logger slog.Logger, creator status.StatusCreator, remover status.StatusRemover, finderByBoard status.StatusFinderByBoard) StatusController {
+	return StatusController{logger, creator, remover, finderByBoard}
 }
 
 func (sc *StatusController) PostController(w http.ResponseWriter, r http.Request) {
@@ -52,4 +53,21 @@ func (sc *StatusController) DeleteController(w http.ResponseWriter, r http.Reque
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (sc *StatusController) GetControllerByBoard(w http.ResponseWriter, r http.Request) {
+	var boardId = r.PathValue("boardId")
+	statuses, err := sc.finderByBoard.Run(r.Context(), boardId)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(statuses)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
