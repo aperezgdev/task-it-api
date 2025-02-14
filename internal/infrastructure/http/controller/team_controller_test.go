@@ -89,3 +89,121 @@ func TestPostTeamController(t *testing.T) {
 		}
 	})
 }
+
+func TestAddMemberController(t *testing.T) {
+	t.Parallel()
+
+	t.Run("should add member", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		teamRepository := repository.MockTeamRepository{}
+		userRepository := repository.MockUserRepository{}
+		teamCreator := team.NewTeamCreator(*slog.Default(), &teamRepository, &userRepository)
+		teamAddMember := team.NewTeamAddMember(*slog.Default(), &teamRepository, &userRepository)
+		teamRemoveMember := team.NewRemoverMember(*slog.Default(), &teamRepository, &userRepository)
+		teamRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Team{}), nil)
+		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.User{}), nil)
+		teamRepository.On("Update", mock.Anything, mock.Anything).Return(nil)
+
+		uuid, _ := uuid.NewV7()
+
+		teamController := NewTeamController(*slog.Default(), teamCreator, teamRemoveMember, teamAddMember)
+		r := httptest.NewRequest(http.MethodPost, "/teams/"+uuid.String()+"/members", bytes.NewBuffer([]byte(`{"id":"` + uuid.String() + `"}`)))
+		r.SetPathValue("teamId", uuid.String())
+		r.SetPathValue("memberId", uuid.String())
+		teamController.PostMemberController(writter, *r)
+
+		if writter.Code != http.StatusCreated {
+			t.Errorf("expected %d, got %d", http.StatusCreated, writter.Code)
+		}
+	})
+
+	t.Run("should return error on team not found", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		teamRepository := repository.MockTeamRepository{}
+		userRepository := repository.MockUserRepository{}
+		teamCreator := team.NewTeamCreator(*slog.Default(), &teamRepository, &userRepository)
+		teamAddMember := team.NewTeamAddMember(*slog.Default(), &teamRepository, &userRepository)
+		teamRemoveMember := team.NewRemoverMember(*slog.Default(), &teamRepository, &userRepository)
+		uuid, _ := uuid.NewV7()
+
+		teamRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Team](), errors.ErrNotExist)
+		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.User{}), nil)
+
+		teamController := NewTeamController(*slog.Default(), teamCreator, teamRemoveMember, teamAddMember)
+		r := httptest.NewRequest(http.MethodPost, "/teams/"+uuid.String()+"/members", bytes.NewBuffer([]byte(`{"id":"` + uuid.String() + `"}`)))
+		r.SetPathValue("teamId", uuid.String())
+		r.SetPathValue("memberId", uuid.String())
+		teamController.PostMemberController(writter, *r)
+
+		if writter.Code != http.StatusNotFound {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)
+		}
+	})
+
+	t.Run("should return error on user not found", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		teamRepository := repository.MockTeamRepository{}
+		userRepository := repository.MockUserRepository{}
+		teamCreator := team.NewTeamCreator(*slog.Default(), &teamRepository, &userRepository)
+		teamAddMember := team.NewTeamAddMember(*slog.Default(), &teamRepository, &userRepository)
+		teamRemoveMember := team.NewRemoverMember(*slog.Default(), &teamRepository, &userRepository)
+		uuid, _ := uuid.NewV7()
+
+		teamRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Team{}), nil)
+		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.User](), errors.ErrNotExist)
+
+		teamController := NewTeamController(*slog.Default(), teamCreator, teamRemoveMember, teamAddMember)
+		r := httptest.NewRequest(http.MethodPost, "/teams/"+uuid.String()+"/members", bytes.NewBuffer([]byte(`{"id":"` + uuid.String() + `"}`)))
+		teamController.PostMemberController(writter, *r)
+
+		if writter.Code != http.StatusNotFound {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)
+		}
+	})
+}
+
+func TestDeleteMemberController(t *testing.T) {
+	t.Parallel()
+
+	t.Run("should delete member", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		teamRepository := repository.MockTeamRepository{}
+		userRepository := repository.MockUserRepository{}
+		teamCreator := team.NewTeamCreator(*slog.Default(), &teamRepository, &userRepository)
+		teamAddMember := team.NewTeamAddMember(*slog.Default(), &teamRepository, &userRepository)
+		teamRemoveMember := team.NewRemoverMember(*slog.Default(), &teamRepository, &userRepository)
+
+		teamRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Team{}), nil)
+		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.User{}), nil)
+
+		uuid, _ := uuid.NewV7()
+
+		teamController := NewTeamController(*slog.Default(), teamCreator, teamRemoveMember, teamAddMember)
+		r := httptest.NewRequest(http.MethodDelete, "/teams/"+uuid.String()+"/members/"+uuid.String(), nil)
+		r.SetPathValue("teamId", uuid.String())
+		r.SetPathValue("memberId", uuid.String())
+		teamController.DeleteMemberController(writter, *r)
+
+		if writter.Code != http.StatusNoContent {
+			t.Errorf("expected %d, got %d", http.StatusNoContent, writter.Code)
+		}
+	})
+	
+	t.Run("should return not found", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		teamRepositoryMock := repository.MockTeamRepository{}
+		teamRepositoryMock.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Team](), errors.ErrNotExist)
+		teamRepositoryMock.On("FindByMember", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Team](), errors.ErrNotExist)		
+		teamController := NewTeamController(*slog.Default(), team.NewTeamCreator(*slog.Default(), &teamRepositoryMock, nil), team.NewRemoverMember(*slog.Default(), &teamRepositoryMock, nil), team.NewTeamAddMember(*slog.Default(), &teamRepositoryMock, nil))	
+		uuid, _ := uuid.NewV7()
+		
+		r := httptest.NewRequest(http.MethodDelete, "/teams/"+uuid.String()+"/members/"+uuid.String(), nil)
+		r.SetPathValue("teamId", uuid.String())
+		r.SetPathValue("memberId", uuid.String())
+		teamController.DeleteMemberController(writter, *r)
+
+		if writter.Code != http.StatusNotFound {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)
+		}
+	})
+}
