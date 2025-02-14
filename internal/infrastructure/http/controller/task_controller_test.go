@@ -35,7 +35,7 @@ func TestPostController(t *testing.T) {
 
 		uuid, _ := uuid.NewV7()
 
-		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, remover)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, remover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer([]byte(`{"title":"title","description":"description", "boardId":"` + uuid.String() + `","creator":"` + uuid.String() + `","asigned":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		taskController.PostController(w, *r)
@@ -60,7 +60,7 @@ func TestPostController(t *testing.T) {
 		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.User{}), nil)
 		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Status{}), nil)
 
-		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer([]byte(`{"a":"title","description":"description","creator":"` + uuid.String() + `","asigned":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		taskController.PostController(w, *r)
@@ -85,7 +85,7 @@ func TestPostController(t *testing.T) {
 		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.User{}), nil)
 		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Status{}), nil)
 
-		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer([]byte(`{"title":"title","description":"description", "boardId":"` + uuid.String() + `","creator":"` + uuid.String() + `","asigned":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		taskController.PostController(w, *r)
@@ -110,7 +110,7 @@ func TestPostController(t *testing.T) {
 		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.User](), errors.ErrNotExist)
 		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Status{}), nil)
 
-		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer([]byte(`{"title":"title","description":"description", "boardId":"` + uuid.String() + `","creator":"` + uuid.String() + `","asigned":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		taskController.PostController(w, *r)
@@ -138,7 +138,7 @@ func TestPatchController(t *testing.T) {
 		taskRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Task{}), nil)
 		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Status{}), nil)
 
-		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPatch, "/tasks/", bytes.NewBuffer([]byte(`{"taskId":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		r.SetPathValue("taskId", uuid.String())
@@ -168,7 +168,7 @@ func TestPatchController(t *testing.T) {
 		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.User{}), nil)
 		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Status{}), nil)
 
-		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPatch, "/tasks", bytes.NewBuffer([]byte(`{"taskId":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		r.SetPathValue("taskId", uuid.String())
@@ -194,7 +194,7 @@ func TestPatchController(t *testing.T) {
 		userRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.User{}), nil)
 		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Status](), errors.ErrNotExist)
 
-		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPatch, "/tasks", bytes.NewBuffer([]byte(`{"taskId":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		r.SetPathValue("taskId", uuid.String())
@@ -213,7 +213,7 @@ func TestDeleteController(t *testing.T) {
 		taskRepository := new(repository.MockTaskRepository)
 		taskRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Task{}), nil)
 		taskRepository.On("Delete", mock.Anything, mock.Anything).Return(nil)
-		taskController := NewTaskController(*slog.Default(), task.NewTaskCreator(*slog.Default(), nil, nil, nil), task.NewTaskMover(*slog.Default(), nil, nil), task.NewTaskRemover(*slog.Default(), taskRepository))
+		taskController := NewTaskController(*slog.Default(), task.NewTaskCreator(*slog.Default(), nil, nil, nil), task.NewTaskMover(*slog.Default(), nil, nil), task.NewTaskRemover(*slog.Default(), taskRepository), task.TaskFinderByTeam{})
 		uuid, _ := uuid.NewV7()
 
 		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
@@ -229,7 +229,7 @@ func TestDeleteController(t *testing.T) {
 	t.Run("should return not found", func(t *testing.T) {
 		taskRepository := new(repository.MockTaskRepository)
 		taskRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Task](), nil)
-		taskController := NewTaskController(*slog.Default(), task.NewTaskCreator(*slog.Default(), nil, nil, nil), task.NewTaskMover(*slog.Default(), nil, nil), task.NewTaskRemover(*slog.Default(), taskRepository))
+		taskController := NewTaskController(*slog.Default(), task.NewTaskCreator(*slog.Default(), nil, nil, nil), task.NewTaskMover(*slog.Default(), nil, nil), task.NewTaskRemover(*slog.Default(), taskRepository), task.TaskFinderByTeam{})
 		uuid, _ := uuid.NewV7()
 
 		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
@@ -239,6 +239,59 @@ func TestDeleteController(t *testing.T) {
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
+		}
+	})
+}
+
+func TestGetControllerByTeam(t *testing.T) {
+	t.Parallel()
+	
+	t.Run("should return task by team", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		taskRepository := repository.MockTaskRepository{}
+		taskRepository.On("FindByTeam", mock.Anything, mock.Anything).Return(pkg.NewOptional([]model.Task{}), nil)
+		boardRepository := repository.MockBoardRepository{}
+		userRepository := repository.MockUserRepository{}
+		statusRepository := repository.MockStatusRepository{}
+		teamRepository := repository.MockTeamRepository{}
+		teamRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Team{}), nil)
+		taskCreator := task.NewTaskCreator(*slog.Default(), &boardRepository, &userRepository, &taskRepository)
+		taskMover := task.NewTaskMover(*slog.Default(), &taskRepository, &statusRepository)
+		taskRemover := task.NewTaskRemover(*slog.Default(), &taskRepository)
+		taskFinderByTeam := task.NewTaskFinderByTeam(*slog.Default(), &taskRepository, &teamRepository)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, taskFinderByTeam)
+		uuid, _ := uuid.NewV7()
+
+		req := httptest.NewRequest(http.MethodGet, "/"+uuid.String(), nil)
+		req.SetPathValue("boardId", uuid.String())
+		taskController.GetControllerByTeam(writter, *req)
+
+		if writter.Code != http.StatusOK {
+			t.Errorf("expected %d, got %d", http.StatusOK, writter.Code)
+		}
+	})
+
+	t.Run("should return not found", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		taskRepositoryMock := repository.MockTaskRepository{}
+		boardRepositoryMock := repository.MockBoardRepository{}
+		userRepositoryMock := repository.MockUserRepository{}
+		statusRepositoryMock := repository.MockStatusRepository{}
+		teamRepositoryMock := repository.MockTeamRepository{}
+		teamRepositoryMock.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Team](), errors.ErrNotExist)
+		taskCreator := task.NewTaskCreator(*slog.Default(), &boardRepositoryMock, &userRepositoryMock, &taskRepositoryMock)
+		taskMover := task.NewTaskMover(*slog.Default(), &taskRepositoryMock, &statusRepositoryMock)
+		taskRemover := task.NewTaskRemover(*slog.Default(), &taskRepositoryMock)
+		taskFinderByTeam := task.NewTaskFinderByTeam(*slog.Default(), &taskRepositoryMock, &teamRepositoryMock)
+		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, taskFinderByTeam)
+		uuid, _ := uuid.NewV7()
+
+		req := httptest.NewRequest(http.MethodGet, "/"+uuid.String(), nil)
+		req.SetPathValue("boardId", uuid.String())
+		taskController.GetControllerByTeam(writter, *req)
+
+		if writter.Code != http.StatusNotFound {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)
 		}
 	})
 }
