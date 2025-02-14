@@ -27,10 +27,11 @@ type TaskController struct {
     creator task.TaskCreator
     mover task.TaskMover
     remover task.TaskRemover
+    finderByTeam task.TaskFinderByTeam
 }
 
-func NewTaskController(logger slog.Logger, creator task.TaskCreator, mover task.TaskMover, remover task.TaskRemover) TaskController {
-    return TaskController{logger, creator, mover, remover}
+func NewTaskController(logger slog.Logger, creator task.TaskCreator, mover task.TaskMover, remover task.TaskRemover, finderByTeam task.TaskFinderByTeam) TaskController {
+    return TaskController{logger, creator, mover, remover, finderByTeam}
 }
 
 func (tc *TaskController) PostController(w http.ResponseWriter, r http.Request) {
@@ -96,4 +97,21 @@ func (tc *TaskController) DeleteController(w http.ResponseWriter, r http.Request
     }
 
     w.WriteHeader(http.StatusNoContent)
+}
+
+func (tc *TaskController) GetControllerByTeam(w http.ResponseWriter, r http.Request) {
+    var boardId = r.PathValue("boardId")
+    tasks, err := tc.finderByTeam.Run(r.Context(), boardId)
+    if err != nil {
+        writeError(w, err)
+        return
+    }
+
+    err = json.NewEncoder(w).Encode(tasks)
+    if err != nil {
+        writeError(w, err)
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
 }
