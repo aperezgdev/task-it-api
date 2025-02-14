@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/aperezgdev/task-it-api/internal/application/status"
+	"github.com/aperezgdev/task-it-api/internal/domain/errors"
 	"github.com/aperezgdev/task-it-api/internal/domain/model"
 	"github.com/aperezgdev/task-it-api/internal/domain/repository"
 	"github.com/aperezgdev/task-it-api/pkg"
@@ -23,7 +24,7 @@ func TestStatusControllerPost(t *testing.T) {
 		statusRepository.On("Save", mock.Anything, mock.Anything).Return(nil)
 		boardRepositoryMock := repository.MockBoardRepository{}
 		boardRepositoryMock.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Board{}), nil)
-		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), statusRepository, &boardRepositoryMock), status.NewStatusRemover(*slog.Default(), nil))
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), statusRepository, &boardRepositoryMock), status.NewStatusRemover(*slog.Default(), nil), status.StatusFinderByBoard{})
 		uuid, _ := uuid.NewV7()
 
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer([]byte(`{"title":"title","board":"` + uuid.String() + `","nextStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"],"previousStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"]}`)))
@@ -40,7 +41,7 @@ func TestStatusControllerPost(t *testing.T) {
 		statusRepository.On("Save", mock.Anything, mock.Anything).Return(nil)
 		boardRepository := new(repository.MockBoardRepository)
 		boardRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Board{}), nil)
-		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), statusRepository, boardRepository), status.NewStatusRemover(*slog.Default(), nil))
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), statusRepository, boardRepository), status.NewStatusRemover(*slog.Default(), nil), status.StatusFinderByBoard{})
 		uuid, _ := uuid.NewV7()
 
 		writer := httptest.NewRecorder()
@@ -59,7 +60,7 @@ func TestStatusControllerDelete(t *testing.T) {
 		statusRepository := new(repository.MockStatusRepository)
 		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Status{}), nil)
 		statusRepository.On("Delete", mock.Anything, mock.Anything).Return(nil)
-		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), nil, nil), status.NewStatusRemover(*slog.Default(), statusRepository))
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), nil, nil), status.NewStatusRemover(*slog.Default(), statusRepository), status.StatusFinderByBoard{})
 		uuid, _ := uuid.NewV7()
 
 		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
@@ -76,7 +77,7 @@ func TestStatusControllerDelete(t *testing.T) {
 		statusRepository := new(repository.MockStatusRepository)
 		statusRepository.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Status](), nil)
 		statusRepository.On("Delete", mock.Anything, mock.Anything).Return(nil)
-		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), nil, nil), status.NewStatusRemover(*slog.Default(), statusRepository))
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), nil, nil), status.NewStatusRemover(*slog.Default(), statusRepository), status.StatusFinderByBoard{})
 		uuid, _ := uuid.NewV7()
 
 		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
@@ -86,6 +87,48 @@ func TestStatusControllerDelete(t *testing.T) {
 
 		if writer.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, writer.Code)
+		}
+	})
+}
+
+func TestStatusControllerGetControllerByBoard(t *testing.T) {
+	t.Parallel()
+
+	t.Run("should return status by board", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		statusRepositoryMock := repository.MockStatusRepository{}
+		boardRepositoryMock := repository.MockBoardRepository{}
+		boardRepositoryMock.On("Find", mock.Anything, mock.Anything).Return(pkg.NewOptional(model.Board{}), nil)
+		statusRepositoryMock.On("FindByBoard", mock.Anything, mock.Anything).Return(pkg.NewOptional([]model.Status{}), nil)
+
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), &statusRepositoryMock, &boardRepositoryMock), status.NewStatusRemover(*slog.Default(), nil), status.NewStatusFinderByBoard(*slog.Default(), &statusRepositoryMock, &boardRepositoryMock))
+		uuid, _ := uuid.NewV7()
+		
+		req := httptest.NewRequest(http.MethodGet, "/"+uuid.String(), nil)
+		req.SetPathValue("boardId", uuid.String())
+		statusController.GetControllerByBoard(writter, *req)
+
+		if writter.Code != http.StatusOK {
+			t.Errorf("expected %d, got %d", http.StatusOK, writter.Code)
+		}
+	})
+
+	t.Run("should return not found", func(t *testing.T) {
+		writter := httptest.NewRecorder()
+		statusRepositoryMock := repository.MockStatusRepository{}	
+		boardRepositoryMock := repository.MockBoardRepository{}	
+		boardRepositoryMock.On("Find", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[model.Board](), errors.ErrNotExist)
+		statusRepositoryMock.On("FindByBoard", mock.Anything, mock.Anything).Return(pkg.EmptyOptional[[]model.Status](), errors.ErrNotExist)
+
+		statusController := NewStatusController(*slog.Default(), status.NewStatusCreator(*slog.Default(), &statusRepositoryMock, &boardRepositoryMock), status.NewStatusRemover(*slog.Default(), nil), status.NewStatusFinderByBoard(*slog.Default(), &statusRepositoryMock, &boardRepositoryMock))
+		uuid, _ := uuid.NewV7()
+		
+		req := httptest.NewRequest(http.MethodGet, "/"+uuid.String(), nil)
+		req.SetPathValue("boardId", uuid.String())
+		statusController.GetControllerByBoard(writter, *req)
+
+		if writter.Code != http.StatusNotFound {
+			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)
 		}
 	})
 }
