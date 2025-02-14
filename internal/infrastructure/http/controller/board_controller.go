@@ -19,10 +19,11 @@ type BoardController struct {
 	logger slog.Logger
 	creator board.BoardCreator
 	remover board.BoardRemover
+	finderByTeam board.BoardFinderByTeam
 }
 
-func NewBoardController(logger slog.Logger, creator board.BoardCreator, remover board.BoardRemover) BoardController {
-	return BoardController{logger, creator, remover}
+func NewBoardController(logger slog.Logger, creator board.BoardCreator, remover board.BoardRemover, finderByTeam board.BoardFinderByTeam) BoardController {
+	return BoardController{logger, creator, remover, finderByTeam}
 }
 
 func (bc *BoardController) PostController(w http.ResponseWriter, r http.Request) {
@@ -52,4 +53,22 @@ func (bc *BoardController) DeleteController(w http.ResponseWriter, r http.Reques
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (bc *BoardController) GetControllerByTeam(w http.ResponseWriter, r http.Request) {
+	var teamId = r.PathValue("teamId")
+
+	boards, err := bc.finderByTeam.Run(r.Context(), teamId)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(boards)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
