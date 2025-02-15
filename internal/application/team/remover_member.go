@@ -41,12 +41,13 @@ func (rm RemoverMember) Run(ctx context.Context, teamId, userId string) error {
 		return errUser
 	}
 
-	userIdBytes := []byte(userId)
+	id , err := valueobject.ValidateId(userId)
+	if err != nil {
+		rm.logger.Info("RemoverMember - Run - User Id is not valid")
+		return err
+	}
 
-	var userIdArray [16]byte
-	copy(userIdArray[:], userIdBytes)
-
-	errRemove := team.RemoveMember(valueobject.Id(userIdArray))
+	errRemove := team.RemoveMember(valueobject.Id(id))
 
 	if errRemove != nil {
 		rm.logger.Info("RemoverMember - Run - User not found")

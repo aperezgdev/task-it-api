@@ -36,12 +36,13 @@ func (tam TeamAddMember) Run(ctx context.Context, idTeam, userId string) error {
 		return err
 	}
 
-	userIdBytes := []byte(userId)
+	id, err := valueobject.ValidateId(userId)
+	if err != nil {
+		tam.logger.Info("TeamAddMember - Run - Member Id is not valid")
+		return err
+	}
 
-	var userIdArray [16]byte
-	copy(userIdArray[:], userIdBytes)
-
-	team.AddMember(valueobject.Id(userIdArray))
+	team.AddMember(valueobject.Id(id))
 
 	teamToUpdate := model.Team{
 		Id: team.Id,
