@@ -1,0 +1,10 @@
+### Create board
+POST {{baseUrl}}/boards
+Content-Type: application/json
+
+{
+    "title": "My Board",
+    "description": "This is my board",
+    "owner": "01950a0f-92db-7ae8-9a67-5bcf0421f246",
+    "team": "01950a10-34e3-7cb5-bd7d-cb3222274b87"
+}

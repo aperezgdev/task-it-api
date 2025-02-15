@@ -1,0 +1,8 @@
+### Create user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+    "name": "Jesus Perez",
+    "email": "alexperez@gmail.com"
+}

@@ -1,0 +1,14 @@
+### Create status
+POST {{baseUrl}}/statuses
+Content-Type: application/json
+
+{
+    "title": "My Status",
+    "description": "This is my status",
+    "board": "01950a0b-eed4-719e-b85a-6733087afdae"
+}
+
+### Get statuses by board
+@boardId = 01950a10-e415-79d3-a9fe-86ab844dc85a
+GET {{baseUrl}}/boards/{{boardId}}/statuses
+Content-Type: application/json

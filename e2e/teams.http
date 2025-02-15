@@ -1,0 +1,22 @@
+### Create team
+POST {{baseUrl}}/teams
+Content-Type: application/json
+
+{
+    "title": "My Team",
+    "description": "This is my team",
+    "owner": "01950a0f-92db-7ae8-9a67-5bcf0421f246"
+}
+
+### Add member
+@teamId = 01950a03-e63e-72ea-87f8-13f52470109e
+POST {{baseUrl}}/teams/{{teamId}}/members
+Content-Type: application/json
+
+{
+    "member": "01950a03-9765-7d42-b939-191239a485a9"
+}
+
+@memberId = 01950a03-9765-7d42-b939-191239a485a9
+### Delete member
+DELETE {{baseUrl}}/teams/{{teamId}}/members/{{memberId}}
