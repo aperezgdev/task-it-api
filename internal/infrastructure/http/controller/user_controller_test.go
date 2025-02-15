@@ -21,7 +21,7 @@ func TestUserControllerPost(t *testing.T) {
 		userRepositoryMock.On("Save", mock.Anything, mock.Anything).Return(nil)
 		userController := NewUserController(*slog.Default(), user.NewUserCreator(*slog.Default(), &userRepositoryMock))
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"email": "email@email.com"}`))
-		userController.PostController(writter, *req)
+		userController.PostController(writter, req)
 
 		if writter.Code != http.StatusCreated {
 			t.Errorf("expected %d, got %d", http.StatusCreated, writter.Code)
@@ -32,7 +32,7 @@ func TestUserControllerPost(t *testing.T) {
 		writter := httptest.NewRecorder()
 		userController := NewUserController(*slog.Default(), user.NewUserCreator(*slog.Default(), nil))
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"email": ""}`))
-		userController.PostController(writter, *req)
+		userController.PostController(writter, req)
 
 		if writter.Code != http.StatusBadRequest {
 			t.Errorf("expected %d, got %d", http.StatusBadRequest, writter.Code)

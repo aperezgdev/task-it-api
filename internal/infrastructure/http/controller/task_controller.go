@@ -34,7 +34,7 @@ func NewTaskController(logger slog.Logger, creator task.TaskCreator, mover task.
     return TaskController{logger, creator, mover, remover, finderByTeam}
 }
 
-func (tc *TaskController) PostController(w http.ResponseWriter, r http.Request) {
+func (tc *TaskController) PostController(w http.ResponseWriter, r *http.Request) {
     var taskRequest taskPostRequest
     err := json.NewDecoder(r.Body).Decode(&taskRequest)
     if err != nil {
@@ -60,7 +60,7 @@ func (tc *TaskController) PostController(w http.ResponseWriter, r http.Request) 
     w.WriteHeader(http.StatusCreated)
 }
 
-func (tc *TaskController) PatchController(w http.ResponseWriter, r http.Request) {
+func (tc *TaskController) PatchController(w http.ResponseWriter, r *http.Request) {
     var taskPatchRequest taskPatchRequest
     taskId := r.PathValue("taskId")
     err := json.NewDecoder(r.Body).Decode(&taskPatchRequest)
@@ -88,7 +88,7 @@ func (tc *TaskController) PatchController(w http.ResponseWriter, r http.Request)
     w.WriteHeader(http.StatusNoContent)
 }
 
-func (tc *TaskController) DeleteController(w http.ResponseWriter, r http.Request) {
+func (tc *TaskController) DeleteController(w http.ResponseWriter, r *http.Request) {
     var taskId = r.PathValue("id")
     err := tc.remover.Run(r.Context(), taskId)
     if err != nil {
@@ -99,7 +99,7 @@ func (tc *TaskController) DeleteController(w http.ResponseWriter, r http.Request
     w.WriteHeader(http.StatusNoContent)
 }
 
-func (tc *TaskController) GetControllerByTeam(w http.ResponseWriter, r http.Request) {
+func (tc *TaskController) GetControllerByTeam(w http.ResponseWriter, r *http.Request) {
     var boardId = r.PathValue("boardId")
     tasks, err := tc.finderByTeam.Run(r.Context(), boardId)
     if err != nil {

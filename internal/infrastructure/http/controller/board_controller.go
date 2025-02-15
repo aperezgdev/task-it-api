@@ -26,7 +26,7 @@ func NewBoardController(logger slog.Logger, creator board.BoardCreator, remover 
 	return BoardController{logger, creator, remover, finderByTeam}
 }
 
-func (bc *BoardController) PostController(w http.ResponseWriter, r http.Request) {
+func (bc *BoardController) PostController(w http.ResponseWriter, r *http.Request) {
 	var boardRequest boardPostRequest
 	err := json.NewDecoder(r.Body).Decode(&boardRequest)
 	if err != nil {

@@ -29,7 +29,7 @@ func TestStatusControllerPost(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer([]byte(`{"title":"title","board":"` + uuid.String() + `","nextStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"],"previousStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"]}`)))
 		writer := httptest.NewRecorder()
-		statusController.PostController(writer, *req)
+		statusController.PostController(writer, req)
 
 		if writer.Code != http.StatusCreated {
 			t.Errorf("expected %d, got %d", http.StatusCreated, writer.Code)
@@ -45,7 +45,7 @@ func TestStatusControllerPost(t *testing.T) {
 		uuid, _ := uuid.NewV7()
 
 		writer := httptest.NewRecorder()
-		statusController.PostController(writer, *httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer([]byte(`{"title":"","board":"` + uuid.String() + `","nextStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"],"previousStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"]}`))))
+		statusController.PostController(writer, httptest.NewRequest(http.MethodPost, "/", bytes.NewBuffer([]byte(`{"title":"","board":"` + uuid.String() + `","nextStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"],"previousStatus":["01946ba3-ee73-76e6-83a9-33f87a35d6e9"]}`))))
 
 		if writer.Code != http.StatusBadRequest {
 			t.Errorf("expected %d, got %d", http.StatusBadRequest, writer.Code)
@@ -66,7 +66,7 @@ func TestStatusControllerDelete(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
 		req.SetPathValue("id", uuid.String())
 		writer := httptest.NewRecorder()
-		statusController.DeleteController(writer, *req)
+		statusController.DeleteController(writer, req)
 
 		if writer.Code != http.StatusNoContent {
 			t.Errorf("expected %d, got %d", http.StatusNoContent, writer.Code)
@@ -83,7 +83,7 @@ func TestStatusControllerDelete(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
 		req.SetPathValue("id", uuid.String())
 		writer := httptest.NewRecorder()
-		statusController.DeleteController(writer, *req)
+		statusController.DeleteController(writer, req)
 
 		if writer.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, writer.Code)
@@ -106,7 +106,7 @@ func TestStatusControllerGetControllerByBoard(t *testing.T) {
 		
 		req := httptest.NewRequest(http.MethodGet, "/"+uuid.String(), nil)
 		req.SetPathValue("boardId", uuid.String())
-		statusController.GetControllerByBoard(writter, *req)
+		statusController.GetControllerByBoard(writter, req)
 
 		if writter.Code != http.StatusOK {
 			t.Errorf("expected %d, got %d", http.StatusOK, writter.Code)
@@ -125,7 +125,7 @@ func TestStatusControllerGetControllerByBoard(t *testing.T) {
 		
 		req := httptest.NewRequest(http.MethodGet, "/"+uuid.String(), nil)
 		req.SetPathValue("boardId", uuid.String())
-		statusController.GetControllerByBoard(writter, *req)
+		statusController.GetControllerByBoard(writter, req)
 
 		if writter.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)

@@ -26,7 +26,7 @@ func NewStatusController(logger slog.Logger, creator status.StatusCreator, remov
 	return StatusController{logger, creator, remover, finderByBoard}
 }
 
-func (sc *StatusController) PostController(w http.ResponseWriter, r http.Request) {
+func (sc *StatusController) PostController(w http.ResponseWriter, r *http.Request) {
 	var statusRequest statusPostRequest
 	err := json.NewDecoder(r.Body).Decode(&statusRequest)
 	if err != nil {
@@ -44,7 +44,7 @@ func (sc *StatusController) PostController(w http.ResponseWriter, r http.Request
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (sc *StatusController) DeleteController(w http.ResponseWriter, r http.Request) {
+func (sc *StatusController) DeleteController(w http.ResponseWriter, r *http.Request) {
 	var statusId = r.PathValue("id")
 	err := sc.remover.Run(r.Context(), statusId)
 	if err != nil {
@@ -55,7 +55,7 @@ func (sc *StatusController) DeleteController(w http.ResponseWriter, r http.Reque
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (sc *StatusController) GetControllerByBoard(w http.ResponseWriter, r http.Request) {
+func (sc *StatusController) GetControllerByBoard(w http.ResponseWriter, r *http.Request) {
 	var boardId = r.PathValue("boardId")
 	statuses, err := sc.finderByBoard.Run(r.Context(), boardId)
 	if err != nil {

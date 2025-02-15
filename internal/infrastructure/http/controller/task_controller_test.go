@@ -38,7 +38,7 @@ func TestPostController(t *testing.T) {
 		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, remover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer([]byte(`{"title":"title","description":"description", "boardId":"` + uuid.String() + `","creator":"` + uuid.String() + `","asigned":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
-		taskController.PostController(w, *r)
+		taskController.PostController(w, r)
 
 		if w.Code != http.StatusCreated {
 			t.Errorf("expected %d, got %d", http.StatusCreated, w.Code)
@@ -63,7 +63,7 @@ func TestPostController(t *testing.T) {
 		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer([]byte(`{"a":"title","description":"description","creator":"` + uuid.String() + `","asigned":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
-		taskController.PostController(w, *r)
+		taskController.PostController(w, r)
 
 		if w.Code != http.StatusBadRequest {
 			t.Errorf("expected %d, got %d", http.StatusBadRequest, w.Code)
@@ -88,7 +88,7 @@ func TestPostController(t *testing.T) {
 		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer([]byte(`{"title":"title","description":"description", "boardId":"` + uuid.String() + `","creator":"` + uuid.String() + `","asigned":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
-		taskController.PostController(w, *r)
+		taskController.PostController(w, r)
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
@@ -113,7 +113,7 @@ func TestPostController(t *testing.T) {
 		taskController := NewTaskController(*slog.Default(), taskCreator, taskMover, taskRemover, task.TaskFinderByTeam{})
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer([]byte(`{"title":"title","description":"description", "boardId":"` + uuid.String() + `","creator":"` + uuid.String() + `","asigned":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
-		taskController.PostController(w, *r)
+		taskController.PostController(w, r)
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
@@ -142,7 +142,7 @@ func TestPatchController(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPatch, "/tasks/", bytes.NewBuffer([]byte(`{"taskId":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		r.SetPathValue("taskId", uuid.String())
-		taskController.PatchController(w, *r)
+		taskController.PatchController(w, r)
 
 		if w.Code != http.StatusNoContent {
 			t.Errorf("expected %d, got %d", http.StatusNoContent, w.Code)
@@ -172,7 +172,7 @@ func TestPatchController(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPatch, "/tasks", bytes.NewBuffer([]byte(`{"taskId":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		r.SetPathValue("taskId", uuid.String())
-		taskController.PatchController(w, *r)
+		taskController.PatchController(w, r)
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
@@ -198,7 +198,7 @@ func TestPatchController(t *testing.T) {
 		w := httptest.NewRecorder()
 		r := httptest.NewRequest(http.MethodPatch, "/tasks", bytes.NewBuffer([]byte(`{"taskId":"` + uuid.String() + `","statusId":"` + uuid.String() + `"}`)))
 		r.SetPathValue("taskId", uuid.String())
-		taskController.PatchController(w, *r)
+		taskController.PatchController(w, r)
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
@@ -219,7 +219,7 @@ func TestDeleteController(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
 		req.SetPathValue("id", uuid.String())
 		w := httptest.NewRecorder()
-		taskController.DeleteController(w, *req)
+		taskController.DeleteController(w, req)
 
 		if w.Code != http.StatusNoContent {
 			t.Errorf("expected %d, got %d", http.StatusNoContent, w.Code)
@@ -235,7 +235,7 @@ func TestDeleteController(t *testing.T) {
 		req := httptest.NewRequest(http.MethodDelete, "/"+uuid.String(), nil)
 		req.SetPathValue("id", uuid.String())
 		w := httptest.NewRecorder()
-		taskController.DeleteController(w, *req)
+		taskController.DeleteController(w, req)
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, w.Code)
@@ -264,7 +264,7 @@ func TestGetControllerByTeam(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/"+uuid.String(), nil)
 		req.SetPathValue("boardId", uuid.String())
-		taskController.GetControllerByTeam(writter, *req)
+		taskController.GetControllerByTeam(writter, req)
 
 		if writter.Code != http.StatusOK {
 			t.Errorf("expected %d, got %d", http.StatusOK, writter.Code)
@@ -288,7 +288,7 @@ func TestGetControllerByTeam(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/"+uuid.String(), nil)
 		req.SetPathValue("boardId", uuid.String())
-		taskController.GetControllerByTeam(writter, *req)
+		taskController.GetControllerByTeam(writter, req)
 
 		if writter.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)

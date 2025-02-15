@@ -110,7 +110,7 @@ func TestAddMemberController(t *testing.T) {
 		r := httptest.NewRequest(http.MethodPost, "/teams/"+uuid.String()+"/members", bytes.NewBuffer([]byte(`{"id":"` + uuid.String() + `"}`)))
 		r.SetPathValue("teamId", uuid.String())
 		r.SetPathValue("memberId", uuid.String())
-		teamController.PostMemberController(writter, *r)
+		teamController.PostMemberController(writter, r)
 
 		if writter.Code != http.StatusCreated {
 			t.Errorf("expected %d, got %d", http.StatusCreated, writter.Code)
@@ -133,7 +133,7 @@ func TestAddMemberController(t *testing.T) {
 		r := httptest.NewRequest(http.MethodPost, "/teams/"+uuid.String()+"/members", bytes.NewBuffer([]byte(`{"id":"` + uuid.String() + `"}`)))
 		r.SetPathValue("teamId", uuid.String())
 		r.SetPathValue("memberId", uuid.String())
-		teamController.PostMemberController(writter, *r)
+		teamController.PostMemberController(writter, r)
 
 		if writter.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)
@@ -154,7 +154,7 @@ func TestAddMemberController(t *testing.T) {
 
 		teamController := NewTeamController(*slog.Default(), teamCreator, teamRemoveMember, teamAddMember)
 		r := httptest.NewRequest(http.MethodPost, "/teams/"+uuid.String()+"/members", bytes.NewBuffer([]byte(`{"id":"` + uuid.String() + `"}`)))
-		teamController.PostMemberController(writter, *r)
+		teamController.PostMemberController(writter, r)
 
 		if writter.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)
@@ -182,7 +182,7 @@ func TestDeleteMemberController(t *testing.T) {
 		r := httptest.NewRequest(http.MethodDelete, "/teams/"+uuid.String()+"/members/"+uuid.String(), nil)
 		r.SetPathValue("teamId", uuid.String())
 		r.SetPathValue("memberId", uuid.String())
-		teamController.DeleteMemberController(writter, *r)
+		teamController.DeleteMemberController(writter, r)
 
 		if writter.Code != http.StatusNoContent {
 			t.Errorf("expected %d, got %d", http.StatusNoContent, writter.Code)
@@ -200,7 +200,7 @@ func TestDeleteMemberController(t *testing.T) {
 		r := httptest.NewRequest(http.MethodDelete, "/teams/"+uuid.String()+"/members/"+uuid.String(), nil)
 		r.SetPathValue("teamId", uuid.String())
 		r.SetPathValue("memberId", uuid.String())
-		teamController.DeleteMemberController(writter, *r)
+		teamController.DeleteMemberController(writter, r)
 
 		if writter.Code != http.StatusNotFound {
 			t.Errorf("expected %d, got %d", http.StatusNotFound, writter.Code)

@@ -22,7 +22,7 @@ type teamPostRequest struct {
 }
 
 type teamPostMemberRequest struct {
-	Id string `json:"id"`
+	Member string `json:"member"`
 }
 
 func NewTeamController(logger slog.Logger, creator team.TeamCreator, removeMember team.RemoverMember, addMember team.TeamAddMember) TeamController {
@@ -52,7 +52,7 @@ func (tc *TeamController) PostTeam(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (tc *TeamController) PostMemberController(w http.ResponseWriter, r http.Request) {
+func (tc *TeamController) PostMemberController(w http.ResponseWriter, r *http.Request) {
 	var memberRequest teamPostMemberRequest
 	var teamId = r.PathValue("teamId")
 	err := json.NewDecoder(r.Body).Decode(&memberRequest)
@@ -64,7 +64,7 @@ func (tc *TeamController) PostMemberController(w http.ResponseWriter, r http.Req
 	errCreator := tc.addMember.Run(
 		r.Context(),
 		teamId,
-		memberRequest.Id,
+		memberRequest.Member,
 	)
 	
 	if errCreator != nil {
@@ -75,7 +75,7 @@ func (tc *TeamController) PostMemberController(w http.ResponseWriter, r http.Req
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (tc *TeamController) DeleteMemberController(w http.ResponseWriter, r http.Request) {
+func (tc *TeamController) DeleteMemberController(w http.ResponseWriter, r *http.Request) {
 	var teamId = r.PathValue("teamId")
 	var memberId = r.PathValue("memberId")
 

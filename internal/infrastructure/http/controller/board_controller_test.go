@@ -31,7 +31,7 @@ func TestBoardControllerPost(t *testing.T) {
 		uuid, _ := uuid.NewV7()
 		
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"title": "title", "description": "description", "owner": "` + uuid.String() + `", "team": "` + uuid.String() + `"}`))
-		boardController.PostController(writter, *req)
+		boardController.PostController(writter, req)
 
 		if writter.Code != http.StatusCreated {
 			t.Errorf("expected %d, got %d", http.StatusCreated, writter.Code)
@@ -42,7 +42,7 @@ func TestBoardControllerPost(t *testing.T) {
 		writter := httptest.NewRecorder()
 		boardController := NewBoardController(*slog.Default(), board.NewBoardCreator(*slog.Default(), nil, nil, nil), board.NewBoardRemover(*slog.Default(), nil), board.NewBoardFinderByTeam(*slog.Default(), nil, nil))
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"title": ""}`))
-		boardController.PostController(writter, *req)
+		boardController.PostController(writter, req)
 
 		if writter.Code != http.StatusBadRequest {
 			t.Errorf("expected %d, got %d", http.StatusBadRequest, writter.Code)

@@ -21,7 +21,7 @@ func NewUserController(logger slog.Logger, creator user.UserCreator) UserControl
 	return UserController{logger, creator}
 }
 
-func (uc *UserController) PostController(w http.ResponseWriter, r http.Request) {
+func (uc *UserController) PostController(w http.ResponseWriter, r *http.Request) {
 	var userRequest userPostRequest
 	err := json.NewDecoder(r.Body).Decode(&userRequest)
 	if err != nil {
