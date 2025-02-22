@@ -7,7 +7,7 @@ import (
 
 	"github.com/aperezgdev/task-it-api/internal/domain/model"
 	valueobject "github.com/aperezgdev/task-it-api/internal/domain/value_object"
-	"github.com/aperezgdev/task-it-api/internal/infrastructure/postgresql/sqlc"
+	"github.com/aperezgdev/task-it-api/internal/infrastructure/repository/postgresql/sqlc"
 	"github.com/aperezgdev/task-it-api/pkg"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
